@@ -1,87 +1,110 @@
-#1. Class Structure 
-
 class Book:
-  def __init__(self, title, author, isbn, genre, publication_date, available=True):
-    self.title = title
-    self.author = author
-    self.isbn = isbn
-    self.genre = genre
-    self.publication_date = publication_date
-    self.available = available
+    def __init__(self, title, author, genre, pub_date):
+        self.__title = title
+        self.__author = author
+        self.__genre = genre
+        self.__pub_date = pub_date
+        self.__available = True
+    
+    # Encapsulated attributes with getter and setter methods
+    def get_title(self):
+        return self.__title
 
-  def get_title(self):
-    return self.title
+    def is_available(self):
+        return self.__available
 
-  def set_title(self, new_title):
-    self.title = new_title
+    def borrow_book(self):
+        if self.__available:
+            self.__available = False
+            return True
+        return False
 
-  # Similar getter and setter methods for other attributes
+    def return_book(self):
+        self.__available = True
 
-  def __str__(self):
-    return f"Title: {self.title}\nAuthor: {self.author}\nISBN: {self.isbn}\nGenre: {self.genre}\nPublication Date: {self.publication_date}\nAvailable: {self.available}"
+    def display_details(self):
+        status = 'Available' if self.__available else 'Borrowed'
+        return f"Title: {self.__title}, Author: {self.__author}, Genre: {self.__genre}, Status: {status}"
 
-#3. User Interaction
+class User:
+    def __init__(self, name, library_id):
+        self.__name = name
+        self.__library_id = library_id
+        self.__borrowed_books = []
 
-import re
+    def borrow_book(self, book):
+        if book.is_available():
+            book.borrow_book()
+            self.__borrowed_books.append(book.get_title())
+            return True
+        return False
 
-def get_int_input(message):
-  while True:
-    try:
-      value = int(input(message))
-      return value
-    except ValueError:
-      print("Invalid input. Please enter an integer.")
+    def return_book(self, book):
+        if book.get_title() in self.__borrowed_books:
+            book.return_book()
+            self.__borrowed_books.remove(book.get_title())
+            return True
+        return False
 
-def get_string_input(message):
-  return input(message)
+    def display_user_details(self):
+        return f"Name: {self.__name}, Library ID: {self.__library_id}, Borrowed Books: {', '.join(self.__borrowed_books) if self.__borrowed_books else 'None'}"
 
-def get_isbn_input():
-  while True:
-    isbn = get_string_input("Enter ISBN (13 digits): ")
-    if re.match(r"^\d{13}$", isbn):
-      return isbn
-    else:
-      print("Invalid ISBN format. Please enter 13 digits.")
+class Author:
+    def __init__(self, name, biography):
+        self.__name = name
+        self.__biography = biography
 
-#4. Main Menu
+    def display_author_details(self):
+        return f"Author: {self.__name}, Biography: {self.__biography}"
 
-from book import Book
-# Import other classes
 
-def main_menu():
-  print("\nWelcome to the Library Management System!")
-  print("Main Menu:")
-  print("1. Book Operations")
-  print("2. User Operations")
-  print("3. Author Operations")
-  print("4. Genre Operations")
-  print("5. Quit")
+class Library:
+    def __init__(self):
+        self.books = []
+        self.users = []
+        self.authors = []
+    
+    def display_main_menu(self):
+        print("\nWelcome to the Library Management System!")
+        print("Main Menu:")
+        print("1. Book Operations")
+        print("2. User Operations")
+        print("3. Author Operations")
+        print("4. Quit")
+        return input("Select an option: ")
+    
+    def book_operations(self):
+        print("\nBook Operations:")
+        print("1. Add a new book")
+        print("2. Borrow a book")
+        print("3. Return a book")
+        print("4. Search for a book")
+        print("5. Display all books")
+        return input("Select an option: ")
 
-  choice = get_int_input("Enter your choice: ")
-  return choice
+from library import Library # type: ignore
 
-def book_operations():
-  # Implement functionalities like adding, borrowing, returning, searching books
-
-def user_operations():
-  # Implement functionalities like adding, viewing, displaying users
-
-def author_operations():
-  # Implement functionalities like adding, viewing, displaying authors
-
-def genre_operations():
-  # Implement functionalities like adding, viewing, displaying genres
+def main():
+    library = Library()
+    
+    while True:
+        choice = library.display_main_menu()
+        
+        if choice == '1':
+            library.book_operations()
+        elif choice == '2':
+            library.user_operations()
+        elif choice == '3':
+            library.author_operations()
+        elif choice == '4':
+            print("Exiting the system. Goodbye!")
+            break
+        else:
+            print("Invalid option, please try again.")
 
 if __name__ == "__main__":
-  while True:
-    choice = main_menu()
-    if choice == 1:
-      book_operations()
-    elif choice == 2:
-      user_operations()
-    # Similar checks for other options
-    elif choice == 5:
-      print("Exiting the system...")
-      break
-    else:
-      print("Invalid choice. Please try again.")
+    main()
+
+def handle_invalid_input():
+    print("Invalid input! Please enter a valid option.")
+
